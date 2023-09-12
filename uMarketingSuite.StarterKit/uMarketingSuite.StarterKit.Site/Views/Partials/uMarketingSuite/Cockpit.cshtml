@@ -1,0 +1,69 @@
+﻿@using Microsoft.AspNetCore.Authentication.Cookies
+@using Microsoft.AspNetCore.Http
+@using Microsoft.Extensions.Options
+@using Umbraco.Cms.Core.Web
+@using Umbraco.Cms.Core.Security
+@using uMarketingSuite.Business.AppState
+@using uMarketingSuite.Business.Common
+@using uMarketingSuite.Web.Common.Umbraco
+@using uMarketingSuite.Business.Analytics.State
+@using uMarketingSuite.Web.Cockpit
+@using uMarketingSuite.Data.Analytics.Processed.Visitor
+
+@inject UMarketingSuiteLicenseState LicenseStatus
+@inject IUmbracoContextAccessor UmbracoContextAccessor
+@inject IUmbracoUserLoginStatus UmbracoUserLoginStatus
+@inject IAnalyticsStateProvider AnalyticsStateProvider
+@inject ICockpitService CockpitService
+@inject IDbVisitorRepository VisitorRepository
+@inject IGlobalSettingsProvider GlobalSettingsProvider
+@inject IHttpContextAccessor HttpContextAccessor
+@inject IBackOfficeSecurityAccessor BackOfficeSecurityAccessor
+@inject IOptionsMonitor<CookieAuthenticationOptions> CookieAuthenticationOptions
+@inject IAppState AppState
+
+@{
+    if (AppState.IsEnabled == false || !UmbracoUserLoginStatus.IsLoggedInToUmbraco())
+    {
+        return;
+    }
+
+    var publishedRequest = UmbracoContextAccessor.TryGetUmbracoContext(out var umbCtx) ? umbCtx.PublishedRequest : null;
+    var analyticsState = AnalyticsStateProvider.GetState();
+    var visitorId = VisitorRepository.Get(analyticsState.Pageview.Session.Visitor.ExternalId)?.Id;
+}
+
+@if (publishedRequest != null)
+{
+    var data = new
+    {
+        analyticsServer = CockpitService.GetAnalyticsServer(),
+        personalizationPersonas = CockpitService.GetPersonalizationPersonas(),
+        personalizationCustomerJourneys = CockpitService.GetPersonalizationCustomerJourneys(),
+        personalizationSegments = CockpitService.GetPersonalizationSegments(),
+
+        pageData = new
+        {
+            pageId = publishedRequest?.PublishedContent?.Id,
+            culture = publishedRequest?.Culture ?? "",
+        },
+
+        profileUrl = visitorId is long vid ? $"{GlobalSettingsProvider.GlobalSettings.UmbracoPath}/#/uMarketingSuite/profiles/insights?id={vid}" : "",
+    };
+
+    <script>
+        window.__UMS_COCKPIT_DATA = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(data));
+    </script>
+}
+
+<!-- Cockpit will be mounted to this div -->
+<div id="ums-cockpit"></div>
+
+<!-- Load Cockpit font outside of main CSS bundle -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+
+<!-- Load Cockpit CSS and JS -->
+<link rel="stylesheet" type="text/css" href="~/Assets/uMarketingSuite/Cockpit/uMarketingSuiteCockpit.css">
+<script src="~/Assets/uMarketingSuite/Cockpit/uMarketingSuiteCockpit.umd.js"></script>
