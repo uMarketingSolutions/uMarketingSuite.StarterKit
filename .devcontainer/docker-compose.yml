@@ -21,12 +21,19 @@ services:
     # Use "forwardPorts" in **devcontainer.json** to forward an app port locally. 
     # (Adding the "ports" property to this file will not forward from a Codespace.)
 
+    # DotNetCore ENV Variables
+    # Overrides the values stored in AppSettings if you was running locally
+    environment:
+    - ConnectionStrings__umbracoDbDSN=Server=localhost;Database=uMarketingSuiteStarterKit;User Id=sa;Password=P@ssw0rd;TrustServerCertificate=true;
+    - ConnectionStrings__umbracoDbDSN_ProviderName=Microsoft.Data.SqlClient
+    
   db:
     image: mcr.microsoft.com/mssql/server:2019-latest
     restart: unless-stopped
     environment:
       SA_PASSWORD: P@ssw0rd
       ACCEPT_EULA: Y
+
 
     # Add "forwardPorts": ["1433"] to **devcontainer.json** to forward MSSQL locally.
     # (Adding the "ports" property to this file will not forward from a Codespace.)
