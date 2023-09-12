@@ -17,18 +17,16 @@
 			"settings": { 
 				"mssql.connections": [
 					{
-						"server": "localhost,1433",
-						"database": "",
+						"profileName": "DB Server",
+						"server": "localhost",
 						"authenticationType": "SqlLogin",
 						"user": "sa",
 						"password": "P@ssw0rd",
-						"emptyPasswordInput": false,
-						"savePassword": false,
-						"profileName": "mssql-container"
+						"trustServerCertificate": true,
+						"savePassword": true						
 					}
 				]
 			},
-			
 			// Add the IDs of extensions you want installed when the container is created.
 			"extensions": [
 				"ms-dotnettools.csharp",
@@ -38,16 +36,24 @@
 	},
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	"forwardPorts": [1433],
-	// "portsAttributes": {
-	//		"5001": {
-	//			"protocol": "https"
-	//		}
-	// }
+	"forwardPorts": [44331, 1396],
+	"portsAttributes": {
+		"44331": {
+			"protocol": "https",
+			"onAutoForward": "openBrowser",
+			"label": "Umbraco Site HTTPS"
+		},
+		"1396": {
+			"protocol": "http",
+			"onAutoForward": "notify"
+		}
+	},
 
 	// postCreateCommand.sh parameters: $1=SA password, $2=dacpac path, $3=sql script(s) path
-	"postCreateCommand": "bash .devcontainer/mssql/postCreateCommand.sh 'P@ssw0rd' './bin/Debug/' './.devcontainer/mssql/'"
+	"postCreateCommand": "bash .devcontainer/mssql/postCreateCommand.sh 'P@ssw0rd' './bin/Debug/' './.devcontainer/mssql/'",
 
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"
+
+	"updateContentCommand": "dotnet dev-certs https --trust"
 }
