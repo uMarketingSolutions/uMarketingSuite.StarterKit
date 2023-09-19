@@ -11,28 +11,20 @@ using Umbraco.Cms.Infrastructure.Packaging;
 
 namespace uMarketingSuite.StarterKit.PackageMigrations;
 
-public class UpdateMasterTemplate : PackageMigrationBase
+public class UpdateMasterTemplate : MigrationBase
 {
     private readonly IFileService _fileService;
     private readonly ILogger<UpdateMasterTemplate> _logger;
 
     public UpdateMasterTemplate(
-        IPackagingService packagingService, 
-        IMediaService mediaService, 
-        MediaFileManager mediaFileManager, 
-        MediaUrlGeneratorCollection mediaUrlGenerators, 
-        IShortStringHelper shortStringHelper, 
-        IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, 
         IMigrationContext context, 
-        IOptions<PackageMigrationSettings> packageMigrationsSettings,
-        IFileService fileService,
+        IFileService fileService, 
         ILogger<UpdateMasterTemplate> logger) 
-        : base(packagingService, mediaService, mediaFileManager, mediaUrlGenerators, shortStringHelper, contentTypeBaseServiceProvider, context, packageMigrationsSettings)
+        : base(context)
     {
         _fileService = fileService;
         _logger = logger;
     }
-
 
     protected override void Migrate()
     {
@@ -63,6 +55,13 @@ public class UpdateMasterTemplate : PackageMigrationBase
             return;
         }
         
+        // Check for existance of 'uMarketingSuite Cockpit' which is part of a comment
+        if (fileContents.Contains("uMarketingSuite Cockpit"))
+        {
+            _logger.LogError("We have already added uMarketingSuite Cockpit");
+            return;
+        }
+        
         // Includes the TAB character as well to line up the HTML with the rest of the template
         var newContent = new StringBuilder();
         newContent.AppendLine("");
@@ -84,4 +83,5 @@ public class UpdateMasterTemplate : PackageMigrationBase
         // Save the template with updated content
         _fileService.SaveTemplate(masterTemplate);
     }
+
 }
