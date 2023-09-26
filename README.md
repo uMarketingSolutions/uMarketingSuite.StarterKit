@@ -1,5 +1,7 @@
-# uMarketingSuite.StarterKit
-This is an example of using uMarketingSuite with Umbraco's own 'The StarterKit'
+# uMarketingSuite.StarterKit 
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/uMarketingSolutions/uMarketingSuite.StarterKit?quickstart=1)
+
+This is an example of using uMarketingSuite with Umbraco's own `The StarterKit`
 
 ## Notes
 This repository is a self contained website with Umbraco and uMarketingSuite installed. 
@@ -15,6 +17,10 @@ It is intended to be used as a reference to see how uMarketingSuite works with U
 ## Requirements
 The Umbraco website database is not included in this repository as SQLite is 
 NOT supported by uMarketingSuite, it needs to be a SQL Server database or a LocalDB.
+
+## Try Now
+You can try this starterkit directly in your browser using GitHub Codespaces.
+
 
 
 ## Credentials
